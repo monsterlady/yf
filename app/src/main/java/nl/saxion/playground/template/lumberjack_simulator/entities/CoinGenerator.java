@@ -4,11 +4,13 @@ import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 
 import nl.saxion.playground.template.R;
 import nl.saxion.playground.template.lumberjack_simulator.Game;
+import nl.saxion.playground.template.lumberjack_simulator.data_storage.Constants;
 import nl.saxion.playground.template.lumberjack_simulator.local_lib.GlobalApplication;
 import nl.saxion.playground.template.lumberjack_simulator.local_lib.Vector;
 
@@ -30,6 +32,7 @@ public class CoinGenerator extends Entity {
     private int NUMBER_OF_COINS = 1;
     private int frameForCoin = 4;
     private int tickRate;
+    private int holderofCoin;
 
     private List<CoinElement> coins;
 
@@ -38,6 +41,7 @@ public class CoinGenerator extends Entity {
         coins = new ArrayList<>();
         Context context = GlobalApplication.getAppContext();
         soundEffects = new SoundEffects(context);
+
     }
 
 
@@ -45,17 +49,39 @@ public class CoinGenerator extends Entity {
     public void tick() {
         //check if lumberjack chopped the tree
             if (game.ifTreeChopped(this)) {
+                /**
+                 * Explanation for Buchi
+                 * There is a boolean in Constants named isSpecailtreecut, which is used to determine whether current cut tree block is special
+                 * If it is, then number of coin gonna become double of that of previous
+                 * Fot instance: 1 coin will come out when normal tree block was cut
+                 * if it is special one, then 2 coins will come out
+                 * */
+                if(Constants.isSpecialtreecut){
+                    holderofCoin = NUMBER_OF_COINS * 2;
+                    for (int i = 0; i < holderofCoin; i++) {
+                        CoinElement element = new CoinElement();
+                        element.setPosition(TreeGenerator.TREE_X_AXIS, 100f);
 
-                for (int i = 0; i < NUMBER_OF_COINS; i++) {
-                    CoinElement element = new CoinElement();
-                    element.setPosition(TreeGenerator.TREE_X_AXIS, 100f);
+                        float directionX = generateNumber(-3, element.MIN_X_SPEED);
+                        float directionY = generateNumber(-7f, 4f);
 
-                    float directionX = generateNumber(-3, element.MIN_X_SPEED);
-                    float directionY = generateNumber(-7f, 4f);
+                        element.setDirection(new Vector(directionX, directionY));
 
-                    element.setDirection(new Vector(directionX, directionY));
+                        coins.add(element);
+                    }
+                } else {
 
-                    coins.add(element);
+                    for (int i = 0; i < NUMBER_OF_COINS; i++) {
+                        CoinElement element = new CoinElement();
+                        element.setPosition(TreeGenerator.TREE_X_AXIS, 100f);
+
+                        float directionX = generateNumber(-3, element.MIN_X_SPEED);
+                        float directionY = generateNumber(-7f, 4f);
+
+                        element.setDirection(new Vector(directionX, directionY));
+
+                        coins.add(element);
+                    }
                 }
                 game.setTreeChopped(false, this);
             }
@@ -77,7 +103,6 @@ public class CoinGenerator extends Entity {
         for (CoinElement element : coins){
             element.tick();
         }
-
     }
 
     @Override

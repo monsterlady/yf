@@ -27,6 +27,7 @@ public class Game extends GameModel {
     private TreeGenerator treeGenerator;
 
     private Map<Entity, Boolean> treeChopped;
+    private Map<Entity,Boolean> treeSpecial;
 
 
     public Game(Activity gameActivity) {
@@ -36,7 +37,7 @@ public class Game extends GameModel {
     @Override
     public void start() {
         treeChopped = new HashMap<>();
-
+        treeSpecial = new HashMap<>();
         Background background = new Background(this);
         addEntity(background);
 
@@ -63,6 +64,10 @@ public class Game extends GameModel {
         for (Entity entity : treeChopped.keySet()) {
             treeChopped.put(entity, chopped);
         }
+    }
+
+    public void setTreeSpecial(Entity entity,boolean b) {
+        treeSpecial.put(entity,b);
     }
 
     public void setTreeChopped(boolean chopped, Entity entity) {

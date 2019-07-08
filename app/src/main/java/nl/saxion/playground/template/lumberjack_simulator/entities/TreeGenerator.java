@@ -8,6 +8,7 @@ import java.util.List;
 import nl.saxion.playground.template.lib.Entity;
 import nl.saxion.playground.template.lib.GameView;
 import nl.saxion.playground.template.lumberjack_simulator.Game;
+import nl.saxion.playground.template.lumberjack_simulator.data_storage.Constants;
 
 /**
  * A class, which has List of tree blocks and manages them
@@ -43,9 +44,22 @@ public class TreeGenerator extends Entity {
     @Override
     public void tick() {
         if (game.ifTreeChopped(this)) {
+
+            /**
+             * Explanation for Buchi
+             * Check if tree block to cut is special
+             * If is set isSpecial true in Constants
+             * */
+            if(logs.get(0).getSpecial()){
+                Constants.setIsSpecialtreecut(true);
+            } else {
+                Constants.setIsSpecialtreecut(false);
+            }
             logs.remove(0);
             game.setTreeChopped(false, this);
             addNewLog = true;
+
+
         }
         if (addNewLog) {
             TreeThread thread = new TreeThread();
@@ -82,6 +96,8 @@ public class TreeGenerator extends Entity {
             Log.i("extra_info", "Coordinates " + i + ") X:" + TREE_X_AXIS + ", Y: " + y);
             y -= logSize;
         }
+
+        Constants.treeElementArrayList = logs;
     }
 
     /**
